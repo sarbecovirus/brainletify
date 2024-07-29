@@ -185,4 +185,45 @@ function applyWarpEffect(x, y, intensity, maxDist, warpMag, aspectRatio) {
     let newData = newImageData.data;
 
     for (let i = 0; i < height; i++) {
-        for (let j
+        for (let j = 0; j < width; j++) {
+            let dx = j - x;
+            let dy = (i - y) / aspectRatio;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+
+            let srcX = j;
+            let srcY = i;
+
+            if (dist < maxDist) {
+                let factor = (maxDist - dist) / maxDist;
+                let offset = Math.round(intensity * factor);
+                srcY = Math.min(height - 1, Math.max(0, i + offset));
+            }
+
+            let srcIndex = (srcY * width + srcX) * 4;
+            let destIndex = (i * width + j) * 4;
+
+            newData[destIndex] = data[srcIndex];
+            newData[destIndex + 1] = data[srcIndex + 1];
+            newData[destIndex + 2] = data[srcIndex + 2];
+            newData[destIndex + 3] = data[srcIndex + 3];
+        }
+    }
+
+    ctx.putImageData(newImageData, 0, 0);
+}
+
+function resetImage() {
+    if (imageLoaded) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(resizedImage, 0, 0);
+    }
+}
+
+function downloadImage() {
+    if (imageLoaded) {
+        let link = document.createElement('a');
+        link.download = 'warped_image.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    }
+}
