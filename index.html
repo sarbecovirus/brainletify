@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Warp Effect</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        #controls {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Warp Effect</h1>
+    <div id="controls">
+        <input type="file" id="imageLoader" name="imageLoader"/>
+        <button onclick="resetImage()">Reset</button>
+        <br>
+        <label for="intensity">Effect Intensity:</label>
+        <input type="range" id="intensitySlider" name="intensitySlider" min="0" max="400" value="200">
+        <input type="number" id="intensityInput" name="intensityInput" min="0" value="200">
+        <br>
+        <label for="maxDist">Max Distance:</label>
+        <input type="range" id="maxDistSlider" name="maxDistSlider" min="0" max="1000" value="200">
+        <input type="number" id="maxDistInput" name="maxDistInput" min="0" value="200">
+        <br>
+        <label for="warpMag">Warp Magnitude:</label>
+        <input type="range" id="warpMagSlider" name="warpMagSlider" min="0" max="1000" value="200">
+        <input type="number" id="warpMagInput" name="warpMagInput" min="0" value="200">
+        <br>
+        <button onclick="downloadImage()">Download</button>
+    </div>
+    <canvas id="imageCanvas"></canvas>
+    <p id="resizeMessage" style="color: red;"></p>
+    <script src="script.js"></script>
+</body>
+</html>
