@@ -1,3 +1,4 @@
+
 let canvas = document.getElementById('imageCanvas');
 let ctx = canvas.getContext('2d');
 let originalImage = new Image();
@@ -98,7 +99,7 @@ function reapplyLastClick() {
     if (lastClick.x !== null && lastClick.y !== null) {
         let intensity = -parseFloat(intensitySlider.value);
         let maxDist = parseFloat(maxDistSlider.value);
-        let warpMag = parseFloat(warpMagSlider.value);
+        let warpMag = parseFloat(warpMagSlider.value) / 200;
         let aspectRatio = parseFloat(aspectRatioSlider.value);
         applyWarpEffect(lastClick.x, lastClick.y, intensity, maxDist, warpMag, aspectRatio);
     }
@@ -195,7 +196,7 @@ function applyWarpEffect(x, y, intensity, maxDist, warpMag, aspectRatio) {
 
             if (dist < maxDist) {
                 let factor = (maxDist - dist) / maxDist;
-                let offset = Math.round(intensity * factor);
+                let offset = Math.round(intensity * factor * warpMag);
                 srcY = Math.min(height - 1, Math.max(0, i + offset));
             }
 
@@ -216,6 +217,7 @@ function resetImage() {
     if (imageLoaded) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(resizedImage, 0, 0);
+        reapplyLastClick();
     }
 }
 
