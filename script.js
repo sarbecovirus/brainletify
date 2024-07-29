@@ -13,6 +13,8 @@ let maxDistSlider = document.getElementById('maxDistSlider');
 let maxDistInput = document.getElementById('maxDistInput');
 let warpMagSlider = document.getElementById('warpMagSlider');
 let warpMagInput = document.getElementById('warpMagInput');
+let aspectRatioSlider = document.getElementById('aspectRatioSlider');
+let aspectRatioInput = document.getElementById('aspectRatioInput');
 
 // Sync sliders and input fields
 intensitySlider.addEventListener('input', function() {
@@ -51,6 +53,20 @@ warpMagInput.addEventListener('input', function() {
     warpMagSlider.value = value;
 });
 
+aspectRatioSlider.addEventListener('input', function() {
+    aspectRatioInput.value = aspectRatioSlider.value;
+});
+
+aspectRatioInput.addEventListener('input', function() {
+    let value = parseFloat(aspectRatioInput.value);
+    if (value > parseFloat(aspectRatioSlider.max)) {
+        aspectRatioSlider.max = value;
+    } else if (value < parseFloat(aspectRatioSlider.min)) {
+        aspectRatioSlider.min = value;
+    }
+    aspectRatioSlider.value = value;
+});
+
 canvas.addEventListener('click', function(event) {
     if (imageLoaded) {
         let rect = canvas.getBoundingClientRect();
@@ -59,7 +75,8 @@ canvas.addEventListener('click', function(event) {
         let intensity = -parseFloat(intensitySlider.value);
         let maxDist = parseFloat(maxDistSlider.value);
         let warpMag = parseFloat(warpMagSlider.value);
-        applyWarpEffect(x, y, intensity, maxDist, warpMag);
+        let aspectRatio = parseFloat(aspectRatioSlider.value);
+        applyWarpEffect(x, y, intensity, maxDist, warpMag, aspectRatio);
     }
 });
 
@@ -131,7 +148,7 @@ function simulateClick() {
     canvas.dispatchEvent(event);
 }
 
-function applyWarpEffect(x, y, intensity, maxDist, warpMag) {
+function applyWarpEffect(x, y, intensity, maxDist, warpMag, aspectRatio) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(resizedImage, 0, 0);
 
@@ -146,7 +163,7 @@ function applyWarpEffect(x, y, intensity, maxDist, warpMag) {
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
             let dx = j - x;
-            let dy = i - y;
+            let dy = (i - y) / aspectRatio;
             let dist = Math.sqrt(dx * dx + dy * dy);
 
             let srcX = j;
