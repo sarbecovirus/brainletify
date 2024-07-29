@@ -4,6 +4,7 @@ let originalImage = new Image();
 let resizedImage = new Image();
 let imageLoaded = false;
 let resizeMessage = document.getElementById('resizeMessage');
+let lastClick = { x: null, y: null };
 
 document.getElementById('imageLoader').addEventListener('change', handleImage, false);
 
@@ -19,6 +20,7 @@ let aspectRatioInput = document.getElementById('aspectRatioInput');
 // Sync sliders and input fields
 intensitySlider.addEventListener('input', function() {
     intensityInput.value = intensitySlider.value;
+    reapplyLastClick();
 });
 
 intensityInput.addEventListener('input', function() {
@@ -27,10 +29,12 @@ intensityInput.addEventListener('input', function() {
         intensitySlider.max = value;
     }
     intensitySlider.value = value;
+    reapplyLastClick();
 });
 
 maxDistSlider.addEventListener('input', function() {
     maxDistInput.value = maxDistSlider.value;
+    reapplyLastClick();
 });
 
 maxDistInput.addEventListener('input', function() {
@@ -39,10 +43,12 @@ maxDistInput.addEventListener('input', function() {
         maxDistSlider.max = value;
     }
     maxDistSlider.value = value;
+    reapplyLastClick();
 });
 
 warpMagSlider.addEventListener('input', function() {
     warpMagInput.value = warpMagSlider.value;
+    reapplyLastClick();
 });
 
 warpMagInput.addEventListener('input', function() {
@@ -51,10 +57,12 @@ warpMagInput.addEventListener('input', function() {
         warpMagSlider.max = value;
     }
     warpMagSlider.value = value;
+    reapplyLastClick();
 });
 
 aspectRatioSlider.addEventListener('input', function() {
     aspectRatioInput.value = aspectRatioSlider.value;
+    reapplyLastClick();
 });
 
 aspectRatioInput.addEventListener('input', function() {
@@ -65,20 +73,27 @@ aspectRatioInput.addEventListener('input', function() {
         aspectRatioSlider.min = value;
     }
     aspectRatioSlider.value = value;
+    reapplyLastClick();
 });
 
 canvas.addEventListener('click', function(event) {
     if (imageLoaded) {
         let rect = canvas.getBoundingClientRect();
-        let x = event.clientX - rect.left;
-        let y = event.clientY - rect.top;
+        lastClick.x = event.clientX - rect.left;
+        lastClick.y = event.clientY - rect.top;
+        reapplyLastClick();
+    }
+});
+
+function reapplyLastClick() {
+    if (lastClick.x !== null && lastClick.y !== null) {
         let intensity = -parseFloat(intensitySlider.value);
         let maxDist = parseFloat(maxDistSlider.value);
         let warpMag = parseFloat(warpMagSlider.value);
         let aspectRatio = parseFloat(aspectRatioSlider.value);
-        applyWarpEffect(x, y, intensity, maxDist, warpMag, aspectRatio);
+        applyWarpEffect(lastClick.x, lastClick.y, intensity, maxDist, warpMag, aspectRatio);
     }
-});
+}
 
 function handleImage(e) {
     let reader = new FileReader();
@@ -169,37 +184,4 @@ function applyWarpEffect(x, y, intensity, maxDist, warpMag, aspectRatio) {
             let srcX = j;
             let srcY = i;
 
-            if (dist < maxDist) {
-                let factor = (maxDist - dist) / maxDist;
-                let offset = Math.round(intensity * factor);
-                srcY = Math.min(height - 1, Math.max(0, i + offset));
-            }
-
-            let srcIndex = (srcY * width + srcX) * 4;
-            let destIndex = (i * width + j) * 4;
-
-            newData[destIndex] = data[srcIndex];
-            newData[destIndex + 1] = data[srcIndex + 1];
-            newData[destIndex + 2] = data[srcIndex + 2];
-            newData[destIndex + 3] = data[srcIndex + 3];
-        }
-    }
-
-    ctx.putImageData(newImageData, 0, 0);
-}
-
-function resetImage() {
-    if (imageLoaded) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(resizedImage, 0, 0);
-    }
-}
-
-function downloadImage() {
-    if (imageLoaded) {
-        let link = document.createElement('a');
-        link.download = 'warped_image.png';
-        link.href = canvas.toDataURL();
-        link.click();
-    }
-}
+            if (
